@@ -1,0 +1,20 @@
+package ru.interprocom.axioma.cache.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+import java.lang.annotation.Annotation;
+import java.util.HashSet;
+
+@Configuration
+@ComponentScan(basePackages = "ru.interprocom.axioma.cache.component")
+public class CacheComponentScanning {
+	@Autowired
+	private ApplicationContext applicationContext;
+
+	public HashSet<Object> getAnnotatedBeans(Class<? extends Annotation> annotation) {
+		return new HashSet<>(applicationContext.getBeansWithAnnotation(annotation).values());
+	}
+}

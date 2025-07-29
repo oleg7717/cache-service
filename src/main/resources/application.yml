@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    username: axioma
+    password: bB7QoVDV9QOm
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://192.168.50.56:5432/axi4utf?stringtype=unspecified&currentSchema=axioma&useUnicode=yes&characterEncoding=UTF-8
+  jpa:
+    show-sql: true
+    #hibernate:
+      #ddl-auto: update
+  output:
+    ansi:
+      enabled: always
+  task:
+    execution:
+      pool:
+        max-size: 16
+        queue-capacity: 100
+        keep-alive: "10s"
+  redis:
+    host: localhost
+    port: 6379
