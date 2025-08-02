@@ -57,6 +57,4 @@ public class CacheDBManager {
 /*	public <K, V> RMap<K, V> getBucket(String backetName) {
 		return redisson.getgetMap(backetName);
 	}*/
-
-//	Multimap
 }

@@ -9,14 +9,13 @@ import org.springframework.stereotype.Component;
 import ru.interprocom.axioma.cache.annotation.AxiCache;
 import ru.interprocom.axioma.cache.config.CacheComponentScanning;
 import ru.interprocom.axioma.cache.core.AxiomaCache;
-import ru.interprocom.axioma.cache.repository.CacheRepository;
 
-import java.util.HashSet;
+import java.util.*;
 
 @Slf4j
 @Component
 public class SynchronizeCache {
-	private static final HashSet<Object> cacheClasses = new HashSet<>();
+	private static final ArrayList<Object> cacheClasses = new ArrayList<>();
 
 	@Autowired
 	private CacheComponentScanning cacheScanning;
@@ -25,17 +24,12 @@ public class SynchronizeCache {
 	public void loadToCacheDB() {
 		cacheClasses.addAll(cacheScanning.getAnnotatedBeans(AxiCache.class));
 
-		cacheClasses.forEach(aClass -> {
-//			CacheRepository<aClass, Long> cacheRepository;
-			((AxiomaCache) aClass).load();
-		});
+		cacheClasses.forEach(aClass -> {((AxiomaCache) aClass).load();});
 	}
 
 	@Scheduled(fixedDelayString = "PT30M")
 	@SchedulerLock(name = "syncCache", lockAtLeastFor = "PT30M", lockAtMostFor = "PT30M")
 	public void syncCache() {
-		cacheClasses.forEach(aClass -> {
-			((AxiomaCache) aClass).sync();
-		});
+		cacheClasses.forEach(aClass -> {((AxiomaCache) aClass).sync();});
 	}
 }

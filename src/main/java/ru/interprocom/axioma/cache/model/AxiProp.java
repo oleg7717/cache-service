@@ -17,8 +17,6 @@ import java.time.LocalDateTime;
 public class AxiProp implements BaseEntity, Serializable {
 	@Id
 	@Column(unique=true)
-//	@GeneratedValue(strategy = SEQUENCE)
-	@EqualsAndHashCode.Include
 	private long axipropid;
 
 	@NotNull

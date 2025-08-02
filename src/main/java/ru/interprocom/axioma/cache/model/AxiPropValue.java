@@ -9,8 +9,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.GenerationType.SEQUENCE;
-
 @Entity
 @Table(name = "axipropvalue")
 @Getter
@@ -19,8 +17,6 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 public class AxiPropValue implements BaseEntity, Serializable {
 	@Id
 	@Column(unique=true, name = "axipropvalueid")
-	@GeneratedValue(strategy = SEQUENCE)
-//	@EqualsAndHashCode.Include
 	private long axipropvalueid;
 
 	@NotNull
@@ -46,7 +42,6 @@ public class AxiPropValue implements BaseEntity, Serializable {
 
 	private String accesstype;
 
-	//	@EqualsAndHashCode.Include
 	private long rowstamp;
 
 /*	@OneToOne(mappedBy = "axipropvalue")
