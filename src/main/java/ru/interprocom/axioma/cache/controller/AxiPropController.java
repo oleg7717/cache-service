@@ -19,13 +19,13 @@ public class AxiPropController {
 	AxiPropService axiPropService;
 
 	@GetMapping(path = "")
-	public ResponseEntity<List<PropertyValueInfo>> index(@RequestParam(defaultValue = "10") Integer limit,
+	public ResponseEntity<List<AxiProp>> index(@RequestParam(defaultValue = "10") Integer limit,
 	                                              @RequestParam(defaultValue = "1") Integer pageNumber) {
 		return axiPropService.getProperties(limit, pageNumber);
 	}
 
 	@GetMapping(path = "/property")
-	public PropertyValueInfo showProperty(@RequestBody AxiProp prop) {
+	public AxiProp showProperty(@RequestBody AxiProp prop) {
 		return axiPropService.getByPropname(prop.getPropname());
 	}
 

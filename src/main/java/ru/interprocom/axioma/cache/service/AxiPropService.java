@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.interprocom.axioma.cache.annotation.DeletingCache;
 import ru.interprocom.axioma.cache.annotation.KeyParam;
 import ru.interprocom.axioma.cache.annotation.StoringCache;
@@ -28,21 +29,18 @@ public class AxiPropService {
 	@Autowired
 	AxiPropMapper axiPropMapper;
 
-	public ResponseEntity<List<PropertyValueInfo>> getProperties(int limit, int pageNumber) {
+	public ResponseEntity<List<AxiProp>> getProperties(int limit, int pageNumber) {
 		Pageable sortedByPropname = PageRequest.of(pageNumber - 1, limit, Sort.by("propname"));
 		Page<AxiProp> result = axiPropRepository.findAll(sortedByPropname);
 		return ResponseEntity.ok()
 				.header("X-Total-Count", String.valueOf(result.getTotalElements()))
 				.header("X-Total-PageCount", String.valueOf(result.getTotalPages()))
-				.body(result.stream()
-						.map(axiPropMapper::map)
-						.toList());
+				.body(result.stream().toList());
 	}
 
-	public PropertyValueInfo getByPropname(String propname) {
-		//ToDo решить проблему N + 1
+	public AxiProp getByPropname(String propname) {
 		return axiPropRepository.findByPropname(propname)
-				.map(axiPropMapper::map)
+//				.map(axiPropMapper::map)
 				.orElseThrow(() -> new ResourceNotFoundException("Property with propname " + propname + " not found"));
 	}
 
@@ -60,6 +58,7 @@ public class AxiPropService {
 	}
 
 	@DeletingCache(cacheName = "axiprop", key = "propDto.propname")
+	@Transactional
 	public void deleteByPropname(@KeyParam AxiPropDeleteDTO propDTO) {
 		axiPropRepository.deleteByPropname(propDTO.getPropname());
 	}

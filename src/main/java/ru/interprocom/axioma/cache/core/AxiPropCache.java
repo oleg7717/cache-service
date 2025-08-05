@@ -46,6 +46,7 @@ public class AxiPropCache extends AxiomaCache {
 		Map<String, PropertyValueInfo> cache = cacheDBManager.getMap(cacheName);
 
 		if (cache.isEmpty()) {
+			//ToDo Реализовать вместо findAll метод для мэппинг в PropertyValueInfo по аналогии с updatedRecords
 			List<PropertyValueInfo> dbRecords = repository.findAll().stream()
 					.map(mapper::map)
 					.toList();
@@ -71,7 +72,6 @@ public class AxiPropCache extends AxiomaCache {
 			Map<String, PropertyValueInfo> updatedDBRecords = repository
 					.updatedRecords(getMaxRowstamp(), getMaxValueRowstamp())
 					.stream()
-					.map(mapper::map)
 					.collect(Collectors.toMap(PropertyValueInfo::getPropname, Function.identity()));;
 
 /*			updatedDBRecords.forEach((propname, propValue) ->
