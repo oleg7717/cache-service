@@ -20,3 +20,11 @@ spring:
   redis:
     host: localhost
     port: 6379
+
+logging:
+  file:
+    name: cache-service.log
+  level:
+    root: info
+    org.springframework.web: debug
+    org.hibernate: error

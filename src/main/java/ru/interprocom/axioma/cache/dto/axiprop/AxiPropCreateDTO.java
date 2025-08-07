@@ -1,7 +1,9 @@
 package ru.interprocom.axioma.cache.dto.axiprop;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import ru.interprocom.axioma.cache.model.AxiPropValue;
 
 import java.time.LocalDateTime;
 
@@ -27,9 +29,6 @@ public class AxiPropCreateDTO {
 	private boolean masked;
 	private int accesstype;
 	private String valuerules;
-	private long axipropvalueid;
-	private String propvalue;
-	private String servername;
-	private String serverhost;
-	private String encryptedvalue;
+
+	private AxiPropValue axipropvalue;
 }

@@ -11,27 +11,28 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.interprocom.axioma.cache.annotation.DeletingCache;
 import ru.interprocom.axioma.cache.annotation.KeyParam;
 import ru.interprocom.axioma.cache.annotation.StoringCache;
+import ru.interprocom.axioma.cache.dto.axiprop.AxiPropCreateDTO;
 import ru.interprocom.axioma.cache.dto.axiprop.AxiPropDeleteDTO;
 import ru.interprocom.axioma.cache.dto.axiprop.AxiPropUpdateDTO;
-import ru.interprocom.axioma.prime.server.PropertyValueInfo;
 import ru.interprocom.axioma.cache.exception.ResourceNotFoundException;
 import ru.interprocom.axioma.cache.mapper.AxiPropMapper;
 import ru.interprocom.axioma.cache.model.AxiProp;
 import ru.interprocom.axioma.cache.repository.AxiPropRepository;
+import ru.interprocom.axioma.prime.server.PropertyValueInfo;
 
 import java.util.List;
 
 @Service
 public class AxiPropService {
 	@Autowired
-	AxiPropRepository axiPropRepository;
+	AxiPropRepository repository;
 
 	@Autowired
-	AxiPropMapper axiPropMapper;
+	AxiPropMapper mapper;
 
 	public ResponseEntity<List<AxiProp>> getProperties(int limit, int pageNumber) {
 		Pageable sortedByPropname = PageRequest.of(pageNumber - 1, limit, Sort.by("propname"));
-		Page<AxiProp> result = axiPropRepository.findAll(sortedByPropname);
+		Page<AxiProp> result = repository.findAll(sortedByPropname);
 		return ResponseEntity.ok()
 				.header("X-Total-Count", String.valueOf(result.getTotalElements()))
 				.header("X-Total-PageCount", String.valueOf(result.getTotalPages()))
@@ -39,27 +40,34 @@ public class AxiPropService {
 	}
 
 	public AxiProp getByPropname(String propname) {
-		return axiPropRepository.findByPropname(propname)
-//				.map(axiPropMapper::map)
+		return repository.findByPropname(propname)
 				.orElseThrow(() -> new ResourceNotFoundException("Property with propname " + propname + " not found"));
 	}
 
-	//ToDo реализовать создание свойств
+	@StoringCache(cacheName = "axiprop", key = "propDto.propname")
+	public PropertyValueInfo createByPropname(@KeyParam AxiPropCreateDTO propDto) {
+		AxiProp axiProp = repository.save(mapper.map(propDto));
+		//Обновляем записи, так как при сохранении / изменении в БД срабатывает триггер заполняющий поле rowstamp
+		repository.refresh(axiProp);
+		return mapper.map(axiProp);
+	}
 
 	@StoringCache(cacheName = "axiprop", key = "propDto.propname")
 	public PropertyValueInfo updateByPropname(@KeyParam AxiPropUpdateDTO propDto) {
 		String propName = propDto.getPropname();
-		AxiProp axiProp = axiPropRepository.findByPropname(propName)
+		AxiProp axiProp = repository.findByPropname(propName)
 				.orElseThrow(() -> new ResourceNotFoundException("Property with propname " + propName + " not found"));
-		axiPropMapper.update(axiProp, propDto);
-		axiPropRepository.save(axiProp);
+		mapper.update(axiProp, propDto);
+		repository.save(axiProp);
+		//Обновляем записи, так как при сохранении / изменении в БД срабатывает триггер заполняющий поле rowstamp
+		repository.refresh(axiProp);
 
-		return axiPropMapper.map(axiProp);
+		return mapper.map(axiProp);
 	}
 
-	@DeletingCache(cacheName = "axiprop", key = "propDto.propname")
 	@Transactional
+	@DeletingCache(cacheName = "axiprop", key = "propDto.propname")
 	public void deleteByPropname(@KeyParam AxiPropDeleteDTO propDTO) {
-		axiPropRepository.deleteByPropname(propDTO.getPropname());
+		repository.deleteByPropname(propDTO.getPropname());
 	}
 }

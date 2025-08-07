@@ -4,11 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.interprocom.axioma.cache.dto.axiprop.AxiPropCreateDTO;
 import ru.interprocom.axioma.cache.dto.axiprop.AxiPropDeleteDTO;
 import ru.interprocom.axioma.cache.dto.axiprop.AxiPropUpdateDTO;
-import ru.interprocom.axioma.prime.server.PropertyValueInfo;
 import ru.interprocom.axioma.cache.model.AxiProp;
 import ru.interprocom.axioma.cache.service.AxiPropService;
+import ru.interprocom.axioma.prime.server.PropertyValueInfo;
 
 import java.util.List;
 
@@ -27,6 +28,11 @@ public class AxiPropController {
 	@GetMapping(path = "/property")
 	public AxiProp showProperty(@RequestBody AxiProp prop) {
 		return axiPropService.getByPropname(prop.getPropname());
+	}
+
+	@PostMapping(path = "")
+	public PropertyValueInfo createByPropname(@RequestBody AxiPropCreateDTO propDTO) {
+		return axiPropService.createByPropname(propDTO);
 	}
 
 	@PutMapping(path = "")

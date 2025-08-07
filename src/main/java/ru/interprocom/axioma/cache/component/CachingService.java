@@ -2,6 +2,7 @@ package ru.interprocom.axioma.cache.component;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -20,6 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
+@Slf4j
 @Aspect
 @Component
 public class CachingService {
@@ -29,30 +31,16 @@ public class CachingService {
 	@AfterReturning(value = "@annotation(ru.interprocom.axioma.cache.annotation.StoringCache)", returning = "returnValue")
 	public void storingCache(JoinPoint joinPoint, Object returnValue)
 			throws NoSuchFieldException, IllegalAccessException {
-		System.out.println("Executing method annotated with @StoringCache");
-
+		log.info("Executing method annotated with @StoringCache");
 		CacheParam cacheParam = getCacheName(joinPoint, StoringCache.class);
-/*		Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-		StoringCache annotation = method.getAnnotation(StoringCache.class);
-		String cacheName = annotation.cacheName();
-		String cacheKey = annotation.key();*/
-
 		Map<Object, Object> cache = cacheDBManager.getMap(cacheParam.getCacheName());
 		cache.put(getParameterValue(joinPoint, cacheParam.getCacheKey()), returnValue);
-
-		System.out.println("cacheName: " + cacheParam.getCacheName());
 	}
 
 	@After(value = "@annotation(ru.interprocom.axioma.cache.annotation.DeletingCache)")
 	public void deletingCache(JoinPoint joinPoint) throws NoSuchFieldException, IllegalAccessException {
-		System.out.println("Executing method annotated with @DeletingCache");
-
+		log.info("Executing method annotated with @DeletingCache");
 		CacheParam cacheParam = getCacheName(joinPoint, DeletingCache.class);
-/*		Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-		DeletingCache annotation = method.getAnnotation(DeletingCache.class);
-		String cacheName = annotation.cacheName();
-		String cacheKey = annotation.key();*/
-
 		Map<Object, Object> cache = cacheDBManager.getMap(cacheParam.getCacheName());
 		cache.remove(getParameterValue(joinPoint, cacheParam.getCacheKey()));
 	}
@@ -90,28 +78,6 @@ public class CachingService {
 		throw new AnnotationException("Method use StoringCache or DeletingCache, but parameter with annotation " +
 				"KeyObject not found.");
 	}
-
-/*	private Object getParameterValue(JoinPoint joinPoint) throws NoSuchFieldException, IllegalAccessException {
-		Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-		StoringCache annotation = method.getAnnotation(StoringCache.class);
-		String cacheKey = annotation.key();
-		Parameter[] params = method.getParameters();
-		String methodParamName = cacheKey.contains(".") ? cacheKey.split("\\.")[0] : cacheKey;
-		List<String> paramList = Arrays.stream(params).map(Parameter::getName).toList();
-		int paramPosition = paramList.indexOf(methodParamName);
-		if (paramPosition == -1) {
-			throw new RuntimeException("Parameter with annotation KeyObject not found.");
-		}
-		Object dto = joinPoint.getArgs()[paramPosition];
-
-		if (cacheKey.contains(".")) {
-			Field field = dto.getClass().getDeclaredField(cacheKey.split("\\.")[1]);
-			field.setAccessible(true);
-			return field.get(dto);
-		} else {
-			return dto;
-		}
-	}*/
 
 	@AllArgsConstructor
 	@Getter

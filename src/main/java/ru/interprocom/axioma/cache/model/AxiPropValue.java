@@ -43,7 +43,4 @@ public class AxiPropValue implements BaseEntity, Serializable {
 	private String accesstype;
 
 	private long rowstamp;
-
-/*	@OneToOne(mappedBy = "axipropvalue")
-	private AxiProp axiprop;*/
 }

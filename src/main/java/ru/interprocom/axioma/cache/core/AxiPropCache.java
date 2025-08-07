@@ -42,15 +42,10 @@ public class AxiPropCache extends AxiomaCache {
 	@Override
 	public void load() {
 		log.info("Start loading {}", this.getClass().getSimpleName());
-		System.out.println("Start loading " + this.getClass().getSimpleName());
 		Map<String, PropertyValueInfo> cache = cacheDBManager.getMap(cacheName);
 
 		if (cache.isEmpty()) {
-			//ToDo Реализовать вместо findAll метод для мэппинг в PropertyValueInfo по аналогии с updatedRecords
-			List<PropertyValueInfo> dbRecords = repository.findAll().stream()
-					.map(mapper::map)
-					.toList();
-			dbRecords.forEach(axiProp -> cache.put(axiProp.getPropname(), axiProp));
+			repository.findAllProperties().forEach(axiProp -> cache.put(axiProp.getPropname(), axiProp));
 		}
 
 		updateCountAndMaxRowstamp(cache);
@@ -63,7 +58,6 @@ public class AxiPropCache extends AxiomaCache {
 	@Override
 	public void sync() {
 		log.info("Sync {}", this.getClass().getSimpleName());
-		System.out.println("Sync " + this.getClass().getSimpleName());
 		if (repository.countAllRecord() != getRecordCount() || repository.maxRowStamp() != getMaxRowstamp()
 				|| repository.maxValueRowStamp() != getMaxValueRowstamp()) {
 			Map<String, PropertyValueInfo> cache = cacheDBManager.getMap(cacheName);
@@ -73,11 +67,6 @@ public class AxiPropCache extends AxiomaCache {
 					.updatedRecords(getMaxRowstamp(), getMaxValueRowstamp())
 					.stream()
 					.collect(Collectors.toMap(PropertyValueInfo::getPropname, Function.identity()));;
-
-/*			updatedDBRecords.forEach((propname, propValue) ->
-					cache.merge(propname, propValue, (oldValue, newValue) ->
-							oldValue.equals(newValue) ? oldValue : newValue));*/
-
 
 			//Добавляем в кэш новые записи и обновляем существующие в кэше, но изменённые в БД
 			cache.putAll(updatedDBRecords);
