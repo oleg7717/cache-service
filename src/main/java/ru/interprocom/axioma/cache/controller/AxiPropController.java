@@ -45,4 +45,16 @@ public class AxiPropController {
 	public void deleteByPropname(@RequestBody AxiPropDeleteDTO propDTO) {
 		axiPropService.deleteByPropname(propDTO);
 	}
+
+	@PostMapping(path = "/reloadAll")
+	@ResponseStatus(HttpStatus.OK)
+	public void reloadAll() {
+		axiPropService.reloadAll();
+	}
+
+	@PostMapping(path = "/reload")
+	@ResponseStatus(HttpStatus.OK)
+	public void reload(@RequestBody AxiProp propDTO) {
+		axiPropService.reload(propDTO);
+	}
 }

@@ -2,17 +2,21 @@ package ru.interprocom.axioma.cache.core;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import ru.interprocom.axioma.cache.annotation.AxiCache;
 import ru.interprocom.axioma.cache.component.CacheDBManager;
+import ru.interprocom.axioma.cache.exception.ResourceNotFoundException;
 import ru.interprocom.axioma.prime.server.PropertyValueInfo;
 import ru.interprocom.axioma.cache.mapper.AxiPropMapper;
 import ru.interprocom.axioma.cache.repository.AxiPropRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,7 +25,9 @@ import java.util.stream.Collectors;
 @Component
 @Setter
 @Getter
+@ConfigurationProperties(prefix = "redis")
 public class AxiPropCache extends AxiomaCache {
+	public boolean isCluster;
 	private final String cacheName = "axiprop";
 	private long maxValueRowstamp;
 
@@ -66,7 +72,7 @@ public class AxiPropCache extends AxiomaCache {
 			Map<String, PropertyValueInfo> updatedDBRecords = repository
 					.updatedRecords(getMaxRowstamp(), getMaxValueRowstamp())
 					.stream()
-					.collect(Collectors.toMap(PropertyValueInfo::getPropname, Function.identity()));;
+					.collect(Collectors.toMap(PropertyValueInfo::getPropname, Function.identity()));
 
 			//Добавляем в кэш новые записи и обновляем существующие в кэше, но изменённые в БД
 			cache.putAll(updatedDBRecords);
@@ -79,13 +85,35 @@ public class AxiPropCache extends AxiomaCache {
 	}
 
 	@Override
+	@Synchronized
 	public void reloadAll() {
-		//ToDo реализовать перезагрузку кэша
+		//ToDo поправить перезагрузку всего кэша
+		Map<String, PropertyValueInfo> dbRecords = repository
+				.findAllProperties()
+				.stream()
+				.collect(Collectors.toMap(PropertyValueInfo::getPropname, Function.identity()));;
+		Map<String, PropertyValueInfo> cache = cacheDBManager.getMap(cacheName);
+
+		//Добавляем в кэш новые записи и обновляем существующие
+		cache.putAll(dbRecords);
+/*		dbRecords.forEach((propname, propValue) ->
+				cache.merge(propname, propValue, (oldValue, newValue) ->
+						oldValue.equals(newValue) ? oldValue : newValue));*/
+
+		//Удаляем из кэша по ключу все записи, которых уже нет в БД
+		cache.keySet().retainAll(dbRecords.keySet());
+
+		updateCountAndMaxRowstamp(cache);
 	}
 
 	@Override
 	public void reload(String propname) {
+		Map<String, PropertyValueInfo> cache = cacheDBManager.getMap(cacheName);
+		repository.findByPropname(propname)
+				.map(mapper::map)
+				.ifPresentOrElse(prop -> cache.put(propname, prop), () -> cache.remove(propname));
 
+		updateCountAndMaxRowstamp(cache);
 	}
 
 	private void updateCountAndMaxRowstamp(Map<String, PropertyValueInfo> cache) {

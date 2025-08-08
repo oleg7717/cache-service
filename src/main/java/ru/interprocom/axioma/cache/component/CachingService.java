@@ -34,6 +34,8 @@ public class CachingService {
 		log.info("Executing method annotated with @StoringCache");
 		CacheParam cacheParam = getCacheName(joinPoint, StoringCache.class);
 		Map<Object, Object> cache = cacheDBManager.getMap(cacheParam.getCacheName());
+		//ToDo при усложнении объекта кэша, придется реализовывать отдельный мэппинг для создания объекта вместо
+		// возвращаемого объекта
 		cache.put(getParameterValue(joinPoint, cacheParam.getCacheKey()), returnValue);
 	}
 

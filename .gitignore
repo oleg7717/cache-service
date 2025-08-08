@@ -3,3 +3,4 @@ build/
 caches/
 .idea/
 *.log
+logs/

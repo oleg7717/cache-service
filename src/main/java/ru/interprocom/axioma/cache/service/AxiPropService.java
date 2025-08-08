@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.interprocom.axioma.cache.annotation.DeletingCache;
 import ru.interprocom.axioma.cache.annotation.KeyParam;
 import ru.interprocom.axioma.cache.annotation.StoringCache;
+import ru.interprocom.axioma.cache.core.AxiPropCache;
 import ru.interprocom.axioma.cache.dto.axiprop.AxiPropCreateDTO;
 import ru.interprocom.axioma.cache.dto.axiprop.AxiPropDeleteDTO;
 import ru.interprocom.axioma.cache.dto.axiprop.AxiPropUpdateDTO;
@@ -24,6 +25,9 @@ import java.util.List;
 
 @Service
 public class AxiPropService {
+	@Autowired
+	AxiPropCache axiPropCache;
+
 	@Autowired
 	AxiPropRepository repository;
 
@@ -69,5 +73,13 @@ public class AxiPropService {
 	@DeletingCache(cacheName = "axiprop", key = "propDto.propname")
 	public void deleteByPropname(@KeyParam AxiPropDeleteDTO propDTO) {
 		repository.deleteByPropname(propDTO.getPropname());
+	}
+
+	public void reloadAll() {
+		axiPropCache.reloadAll();
+	}
+
+	public void reload(AxiProp propDTO) {
+		axiPropCache.reload(propDTO.getPropname());
 	}
 }

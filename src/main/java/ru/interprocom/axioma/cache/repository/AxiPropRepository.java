@@ -26,8 +26,7 @@ public interface AxiPropRepository extends RefreshRepository<AxiProp, Long> {
 			"p.propname, p.axitype, p.liverefresh, p.encrypted, p.domainid, p.securelevel, p.rowstamp," +
 			"v.propvalue, v.serverhost, v.servername, v.encryptedvalue, v.rowstamp as axipropvalueRowstamp) " +
 			"from AxiProp p " +
-			"left join AxiPropValue v on p.propname = v.propname " +
-			"where p.rowstamp > :rowstamp or v.rowstamp > :vrowstamp")
+			"left join AxiPropValue v on p.propname = v.propname ")
 	List<PropertyValueInfo> findAllProperties();
 
 	@EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "axipropvalue")
@@ -43,7 +42,7 @@ public interface AxiPropRepository extends RefreshRepository<AxiProp, Long> {
 			"from AxiProp p " +
 			"left join AxiPropValue v on p.propname = v.propname " +
 			"where p.rowstamp > :rowstamp or v.rowstamp > :vrowstamp")
-	List<PropertyValueInfo> updatedRecords(@Param("rowstamp") Long rowstamp, @Param("valuerowstamp") Long vrowstamp);
+	List<PropertyValueInfo> updatedRecords(@Param("rowstamp") Long rowstamp, @Param("vrowstamp") Long vrowstamp);
 
 	void deleteByPropname(String propname);
 
