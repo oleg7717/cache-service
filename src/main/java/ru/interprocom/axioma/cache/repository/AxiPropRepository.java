@@ -26,7 +26,7 @@ public interface AxiPropRepository extends RefreshRepository<AxiProp, Long> {
 			"p.propname, p.axitype, p.liverefresh, p.encrypted, p.domainid, p.securelevel, p.rowstamp," +
 			"v.propvalue, v.serverhost, v.servername, v.encryptedvalue, v.rowstamp as axipropvalueRowstamp) " +
 			"from AxiProp p " +
-			"left join AxiPropValue v on p.propname = v.propname ")
+			"inner join AxiPropValue v on p.propname = v.propname")
 	List<PropertyValueInfo> findAllProperties();
 
 	@EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "axipropvalue")
@@ -40,21 +40,25 @@ public interface AxiPropRepository extends RefreshRepository<AxiProp, Long> {
 			"p.propname, p.axitype, p.liverefresh, p.encrypted, p.domainid, p.securelevel, p.rowstamp," +
 			"v.propvalue, v.serverhost, v.servername, v.encryptedvalue, v.rowstamp as axipropvalueRowstamp) " +
 			"from AxiProp p " +
-			"left join AxiPropValue v on p.propname = v.propname " +
+			"inner join AxiPropValue v on p.propname = v.propname " +
 			"where p.rowstamp > :rowstamp or v.rowstamp > :vrowstamp")
 	List<PropertyValueInfo> updatedRecords(@Param("rowstamp") Long rowstamp, @Param("vrowstamp") Long vrowstamp);
 
 	void deleteByPropname(String propname);
 
-	@Query(value = "select propname from axiprop", nativeQuery = true)
+	@Query(value = "select propname from axiprop p " +
+			"where exists (select 1 from axipropvalue v where v.propname = p.propname)", nativeQuery = true)
 	List<String> propnameList();
 
-	@Query(value = "select max(cast((rowstamp) as decimal)) from axiprop", nativeQuery = true)
+	@Query(value = "select max(cast((rowstamp) as decimal)) from axiprop p " +
+			"where exists (select 1 from axipropvalue v where v.propname = p.propname)", nativeQuery = true)
 	Long maxRowStamp();
 
-	@Query(value = "select max(cast((rowstamp) as decimal)) from axipropvalue", nativeQuery = true)
+	@Query(value = "select max(cast((rowstamp) as decimal)) from axipropvalue v " +
+			"where exists (select 1 from axiprop p where v.propname = p.propname)", nativeQuery = true)
 	Long maxValueRowStamp();
 
-	@Query(value = "select count(1) from axiprop", nativeQuery = true)
+	@Query(value = "select count(1) from axiprop p " +
+			"where exists (select 1 from axipropvalue v where v.propname = p.propname)", nativeQuery = true)
 	Long countAllRecord();
 }

@@ -9,14 +9,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import ru.interprocom.axioma.cache.annotation.AxiCache;
 import ru.interprocom.axioma.cache.component.CacheDBManager;
-import ru.interprocom.axioma.cache.exception.ResourceNotFoundException;
 import ru.interprocom.axioma.prime.server.PropertyValueInfo;
 import ru.interprocom.axioma.cache.mapper.AxiPropMapper;
 import ru.interprocom.axioma.cache.repository.AxiPropRepository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,7 +25,6 @@ import java.util.stream.Collectors;
 @Getter
 @ConfigurationProperties(prefix = "redis")
 public class AxiPropCache extends AxiomaCache {
-	public boolean isCluster;
 	private final String cacheName = "axiprop";
 	private long maxValueRowstamp;
 
@@ -87,7 +84,6 @@ public class AxiPropCache extends AxiomaCache {
 	@Override
 	@Synchronized
 	public void reloadAll() {
-		//ToDo поправить перезагрузку всего кэша
 		Map<String, PropertyValueInfo> dbRecords = repository
 				.findAllProperties()
 				.stream()

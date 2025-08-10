@@ -13,7 +13,7 @@ public class RefreshRepositoryImpl<T, ID extends Serializable> extends SimpleJpa
 	@Autowired
 	EntityManager entityManager;
 
-	public RefreshRepositoryImpl(JpaEntityInformation entityInformation, EntityManager entityManager) {
+	public RefreshRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
 		super(entityInformation, entityManager);
 		this.entityManager = entityManager;
 	}
