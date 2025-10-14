@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "axiprop")
-//@SecondaryTable(name = "axipropvalue")
 @Setter
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -20,7 +19,7 @@ public class AxiProp implements BaseEntity, Serializable {
 	private long axipropid;
 
 	@NotNull
-	@Column(unique=true/*, table = "axiprop", name = "propname"*/)
+	@Column(unique=true)
 	@EqualsAndHashCode.Include
 	private String propname;
 
@@ -85,16 +84,4 @@ public class AxiProp implements BaseEntity, Serializable {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "propname", referencedColumnName = "propname", insertable = false, updatable = false)
 	private AxiPropValue axipropvalue;
-/*	@Column(table = "axipropvalue", name = "axipropvalueid")
-	private long axipropvalueid;
-	@Column(table = "axipropvalue", name = "propvalue")
-	private String propvalue;
-	@Column(table = "axipropvalue", name = "servername")
-	private String servername;
-	@Column(table = "axipropvalue", name = "serverhost")
-	private String serverhost;
-	@Column(table = "axipropvalue", name = "encryptedvalue")
-	private String encryptedvalue;
-	@Column(table = "axipropvalue", name = "rowstamp")
-	private long valueRowstamp;*/
 }

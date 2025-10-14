@@ -1,9 +1,11 @@
 package ru.interprocom.axioma.prime.server;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

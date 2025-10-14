@@ -17,6 +17,27 @@ spring:
         max-size: 16
         queue-capacity: 100
         keep-alive: "10s"
-  redis:
-    host: localhost
-    port: 6379
+  main:
+    banner-mode: off
+
+redis:
+  url: "redis://localhost:6379"
+  user:
+  password:
+  clustered: false
+
+
+logging:
+  file:
+    name: logs/cache-service.log
+    max-size: 10Mb
+    max-history: 7
+#  logback:
+#    rollingpolicy:
+#      file-name-pattern: application.%d{yyyy-MM-dd}.%i.log
+#      max-file-size: 10KB
+#      max-history: 10
+  level:
+    root: info
+    org.springframework.web: debug
+    org.hibernate: error

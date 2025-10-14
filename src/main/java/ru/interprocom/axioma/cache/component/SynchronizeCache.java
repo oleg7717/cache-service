@@ -23,7 +23,6 @@ public class SynchronizeCache {
 	@PostConstruct
 	public void loadToCacheDB() {
 		cacheClasses.addAll(cacheScanning.getAnnotatedBeans(AxiCache.class));
-
 		cacheClasses.forEach(aClass -> {((AxiomaCache) aClass).load();});
 	}
 

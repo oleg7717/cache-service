@@ -3,13 +3,14 @@ package ru.interprocom.axioma.cache.dto.axiprop;
 import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.jackson.nullable.JsonNullable;
+import ru.interprocom.axioma.cache.model.AxiPropValue;
 
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
 public class AxiPropUpdateDTO {
-	/*Поле ключа для сохранения в кэш должно быть без обертки JsonNullable*/
+	// Поле ключа для сохранения в кэш должно быть без обертки JsonNullable
 	private String propname;
 	private JsonNullable<String> description;
 	private JsonNullable<String> axitype;
@@ -28,6 +29,7 @@ public class AxiPropUpdateDTO {
 	private JsonNullable<Boolean> masked;
 	private JsonNullable<Integer> accesstype;
 	private JsonNullable<String> valuerules;
+
 	private JsonNullable<String> propvalue;
 	private JsonNullable<String> servername;
 	private JsonNullable<String> serverhost;
