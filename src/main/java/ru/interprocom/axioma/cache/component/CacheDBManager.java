@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Getter
 @ConfigurationProperties(prefix = "redis")
-public class CacheDBManager {
+public class CacheDBManager<K, V> implements CacheContainer<K, V> {
 	private String url;
 	private String user;
 	private String password;
@@ -51,11 +51,11 @@ public class CacheDBManager {
 		return url;
 	}
 
-	public <K, V> RMap<K, V> getMap(String mapName) {
+	public RMap<K, V> getMap(String mapName) {
 		return getConnection().getMap(mapName);
 	}
 
-	public <K, V> RBucket<K> getBucket(String bucketName) {
+	public RBucket<K> getBucket(String bucketName) {
 		return getConnection().getBucket(bucketName);
 	}
 }

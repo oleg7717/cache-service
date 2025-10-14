@@ -11,8 +11,11 @@ import java.util.Collection;
 @Configuration
 @ComponentScan(basePackages = "ru.interprocom.axioma.cache.core")
 public class CacheComponentScanning {
-	@Autowired
 	private ApplicationContext applicationContext;
+	@Autowired
+	public CacheComponentScanning(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
 
 	public Collection<Object> getAnnotatedBeans(Class<? extends Annotation> annotation) {
 		return applicationContext.getBeansWithAnnotation(annotation).values();

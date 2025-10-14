@@ -1,6 +1,5 @@
 package ru.interprocom.axioma.cache.repository;
 
-import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -42,7 +41,7 @@ public interface AxiPropRepository extends RefreshRepository<AxiProp, Long> {
 			"from AxiProp p " +
 			"inner join AxiPropValue v on p.propname = v.propname " +
 			"where p.rowstamp > :rowstamp or v.rowstamp > :vrowstamp")
-	List<PropertyValueInfo> updatedRecords(@Param("rowstamp") Long rowstamp, @Param("vrowstamp") Long vrowstamp);
+	List<PropertyValueInfo> updatedRecords(/*@Param("rowstamp") */Long rowstamp, /*@Param("vrowstamp") */Long vrowstamp);
 
 	void deleteByPropname(String propname);
 

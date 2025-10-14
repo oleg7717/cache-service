@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import ru.interprocom.axioma.cache.annotation.AxiCache;
-import ru.interprocom.axioma.cache.component.CacheDBManager;
+import ru.interprocom.axioma.cache.component.CacheContainer;
 import ru.interprocom.axioma.prime.server.PropertyValueInfo;
 import ru.interprocom.axioma.cache.mapper.AxiPropMapper;
 import ru.interprocom.axioma.cache.repository.AxiPropRepository;
@@ -27,16 +27,18 @@ import java.util.stream.Collectors;
 public class AxiPropCache extends AxiomaCache {
 	private final String cacheName = "axiprop";
 	private long maxValueRowstamp;
-
 	//Используется собственная реализация подключения к keyDB на основе библиотеки Redisson для	совместимости с Аксиомой
-	@Autowired
-	CacheDBManager cacheDBManager;
+	//или объект реализующий интерфейс CacheMap
+	private CacheContainer<String, PropertyValueInfo> cacheContainer;
+	private AxiPropRepository repository;
+	private AxiPropMapper mapper;
 
 	@Autowired
-	AxiPropRepository repository;
-
-	@Autowired
-	AxiPropMapper mapper;
+	public AxiPropCache(CacheContainer<String, PropertyValueInfo> cacheContainer, AxiPropRepository repository, AxiPropMapper mapper) {
+		this.cacheContainer = cacheContainer;
+		this.repository = repository;
+		this.mapper = mapper;
+	}
 
 	/**
 	 * Первичная загрузка свойств системы в хранилище кэша. Выполняется после создания бинов и внедрения всех
@@ -45,7 +47,7 @@ public class AxiPropCache extends AxiomaCache {
 	@Override
 	public void load() {
 		log.info("Start loading {}", this.getClass().getSimpleName());
-		Map<String, PropertyValueInfo> cache = cacheDBManager.getMap(cacheName);
+		Map<String, PropertyValueInfo> cache = cacheContainer.getMap(cacheName);
 
 		if (cache.isEmpty()) {
 			repository.findAllProperties().forEach(axiProp -> cache.put(axiProp.getPropname(), axiProp));
@@ -63,7 +65,7 @@ public class AxiPropCache extends AxiomaCache {
 		log.info("Sync {}", this.getClass().getSimpleName());
 		if (repository.countAllRecord() != getRecordCount() || repository.maxRowStamp() != getMaxRowstamp()
 				|| repository.maxValueRowStamp() != getMaxValueRowstamp()) {
-			Map<String, PropertyValueInfo> cache = cacheDBManager.getMap(cacheName);
+			Map<String, PropertyValueInfo> cache = cacheContainer.getMap(cacheName);
 
 			List<String> propnames = repository.propnameList();
 			Map<String, PropertyValueInfo> updatedDBRecords = repository
@@ -87,8 +89,8 @@ public class AxiPropCache extends AxiomaCache {
 		Map<String, PropertyValueInfo> dbRecords = repository
 				.findAllProperties()
 				.stream()
-				.collect(Collectors.toMap(PropertyValueInfo::getPropname, Function.identity()));;
-		Map<String, PropertyValueInfo> cache = cacheDBManager.getMap(cacheName);
+				.collect(Collectors.toMap(PropertyValueInfo::getPropname, Function.identity()));
+		Map<String, PropertyValueInfo> cache = cacheContainer.getMap(cacheName);
 
 		//Добавляем в кэш новые записи и обновляем существующие
 		cache.putAll(dbRecords);
@@ -104,7 +106,7 @@ public class AxiPropCache extends AxiomaCache {
 
 	@Override
 	public void reload(String propname) {
-		Map<String, PropertyValueInfo> cache = cacheDBManager.getMap(cacheName);
+		Map<String, PropertyValueInfo> cache = cacheContainer.getMap(cacheName);
 		repository.findByPropname(propname)
 				.map(mapper::map)
 				.ifPresentOrElse(prop -> cache.put(propname, prop), () -> cache.remove(propname));

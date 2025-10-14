@@ -25,14 +25,16 @@ import java.util.List;
 
 @Service
 public class AxiPropService {
-	@Autowired
-	AxiPropCache axiPropCache;
+	private final AxiPropCache axiPropCache;
+	private final AxiPropRepository repository;
+	private final AxiPropMapper mapper;
 
 	@Autowired
-	AxiPropRepository repository;
-
-	@Autowired
-	AxiPropMapper mapper;
+	public AxiPropService(AxiPropCache axiPropCache, AxiPropRepository repository, AxiPropMapper mapper) {
+		this.axiPropCache = axiPropCache;
+		this.repository = repository;
+		this.mapper = mapper;
+	}
 
 	public ResponseEntity<List<AxiProp>> getProperties(int limit, int pageNumber) {
 		Pageable sortedByPropname = PageRequest.of(pageNumber - 1, limit, Sort.by("propname"));
