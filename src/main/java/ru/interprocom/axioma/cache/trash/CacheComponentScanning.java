@@ -1,4 +1,4 @@
-package ru.interprocom.axioma.cache.config;
+package ru.interprocom.axioma.cache.trash;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

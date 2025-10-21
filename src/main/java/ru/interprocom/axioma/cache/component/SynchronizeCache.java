@@ -3,26 +3,25 @@ package ru.interprocom.axioma.cache.component;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ru.interprocom.axioma.cache.annotation.AxiCache;
-import ru.interprocom.axioma.cache.config.CacheComponentScanning;
 import ru.interprocom.axioma.cache.core.AxiomaCache;
 
 import java.util.*;
 
 @Slf4j
 @Component
-public class SynchronizeCache {
+public class SynchronizeCache implements ApplicationContextAware {
 	private static final ArrayList<Object> cacheClasses = new ArrayList<>();
-
-	@Autowired
-	private CacheComponentScanning cacheScanning;
+	private ApplicationContext applicationContext;
 
 	@PostConstruct
 	public void loadToCacheDB() {
-		cacheClasses.addAll(cacheScanning.getAnnotatedBeans(AxiCache.class));
+		cacheClasses.addAll(applicationContext.getBeansWithAnnotation(AxiCache.class).values());
 		cacheClasses.forEach(aClass -> {((AxiomaCache) aClass).load();});
 	}
 
@@ -30,5 +29,10 @@ public class SynchronizeCache {
 	@SchedulerLock(name = "syncCache", lockAtLeastFor = "PT30M", lockAtMostFor = "PT30M")
 	public void syncCache() {
 		cacheClasses.forEach(aClass -> {((AxiomaCache) aClass).sync();});
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
 	}
 }
