@@ -34,7 +34,7 @@ public class AxiPropCache extends AxiomaCache {
 	private AxiPropMapper mapper;
 
 	@Autowired
-	public AxiPropCache(CacheContainer<String, PropertyValueInfo> cacheContainer, AxiPropRepository repository, AxiPropMapper mapper) {
+	public AxiPropCache(CacheContainer cacheContainer, AxiPropRepository repository, AxiPropMapper mapper) {
 		this.cacheContainer = cacheContainer;
 		this.repository = repository;
 		this.mapper = mapper;
