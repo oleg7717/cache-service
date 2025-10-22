@@ -1,25 +1,18 @@
-package ru.interprocom.axioma.cache.config;
+package ru.interprocom.axioma.cache.trash;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
-
 @Configuration
-@EnableJpaRepositories(basePackages = "ru.interprocom.axioma.cache")
+//@EnableJpaRepositories(repositoryBaseClass = RefreshRepositoryImpl.class)
 @EnableTransactionManagement
 public class H2JpaConfig {
 	@Autowired
 	private Environment env;
 
-	@Bean
+/*	@Bean
 	@Profile("test")
 	public DataSource dataSource() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -29,5 +22,5 @@ public class H2JpaConfig {
 		dataSource.setPassword("sa");
 
 		return dataSource;
-	}
+	}*/
 }
