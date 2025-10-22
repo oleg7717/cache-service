@@ -29,10 +29,19 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-devtools")
     implementation("org.postgresql:postgresql:42.7.7")
-    implementation("org.redisson:redisson:3.50.0")
+    implementation("org.redisson:redisson:3.50.0") {
+        exclude(group = "io.netty", module = "netty-common")
+        exclude(group = "io.netty", module = "netty-handler")
+        exclude(group = "io.netty", module = "netty-codec")
+    }
+    implementation("io.netty:netty-common:4.2.7.Final")
+    implementation("io.netty:netty-handler:4.2.7.Final")
+    implementation("io.netty:netty-codec:4.2.7.Final")
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-redis-spring:6.9.0")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis:3.5.3")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis:3.5.3") {
+        exclude(group = "io.netty", module = "netty-handler")
+    }
     implementation("org.openapitools:jackson-databind-nullable:0.2.6")
     implementation("org.instancio:instancio-junit:3.3.1")
 

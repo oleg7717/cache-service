@@ -1,8 +1,10 @@
 package ru.interprocom.axioma.cache.core;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public abstract class AxiomaCache {
 	private long maxRowstamp;
 	private long recordCount;
