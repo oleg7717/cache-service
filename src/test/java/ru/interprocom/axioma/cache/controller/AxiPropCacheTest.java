@@ -9,6 +9,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.test.context.ActiveProfiles;
 import ru.interprocom.axioma.cache.component.MapContainer;
@@ -39,6 +40,8 @@ public class AxiPropCacheTest {
 	private AxiPropCache axiPropCache;
 	private AxiProp axiProp;
 	private Map<String, PropertyValueInfo> cacheMap;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private AxiPropRepository axiPropRepository;
@@ -57,27 +60,47 @@ public class AxiPropCacheTest {
 		axiProp = getRandomRecord(axiPropRepository.findAll());
 		container.setMap("axiprop");
 		axiPropCache = new AxiPropCache(container, axiPropRepository, mapper);
-		axiPropCache.load();
 		cacheMap = axiPropCache.getCacheContainer().getMap(axiPropCache.getCacheName());
 	}
 
 	@Test
 	@Order(1)
 	public void testLoad() {
+		axiPropCache.load();
+
 		checkResult();
 	}
 
-/*	@Test
+	@Test
 	@Order(2)
 	public void testSyncWithCreateAndDelete() {
-		Map<String, PropertyValueInfo> cacheMap = axiPropCache.getCacheContainer().getMap(axiPropCache.getCacheName());
-		assertThat(cacheMap.size()).isEqualTo(axiPropRepository.countAllRecord());
-		assertThat(cacheMap.containsKey(axiPropRepository.findAll().get(0).getPropname())).isTrue();
-	}*/
+		axiPropCache.load();
+
+		String propname = "axe.cache.scripts.newProp";
+		String sql = "INSERT INTO axiprop (axipropid,propname,description,axitype,globalonly,instanceonly,axiomadefault," +
+				"liverefresh,encrypted,domainid,nullsallowed,securelevel,userdefined,onlinechanges,changeby,changedate," +
+				"masked,accesstype,valuerules) VALUES\n" +
+				"(1000,'axe.cache.scripts.newProp','new property','YORN',0,0,'0',0,0,NULL,0,'SECURE',0,0,'AXIOMA'," +
+				"'2024-03-04 12:00:00',0,2,NULL)";
+		jdbcTemplate.update(sql);
+		sql = "INSERT INTO axipropvalue (axipropvalueid,propname,servername,serverhost,propvalue,encryptedvalue," +
+				"changeby,changedate,accesstype) VALUES\n" +
+				"(1000,'axe.cache.scripts.newProp','COMMON',NULL,'true',NULL,'AXIOMA','2024-03-04 12:00:00',0)";
+		jdbcTemplate.update(sql);
+
+		axiPropRepository.delete(axiProp);
+		axiPropCache.sync();
+		axiProp = axiPropRepository.findByPropname(propname)
+				.orElseThrow(() -> new ResourceNotFoundException("Property with propname " + propname + " not found"));
+
+		checkResult();
+	}
 
 	@Test
 	@Order(3)
 	public void testSyncWithUpdateParentRecord() {
+		axiPropCache.load();
+
 		axiProp.setDescription(axiProp.getDescription() + LocalTime.now());
 		axiPropRepository.save(axiProp);
 		axiPropCache.sync();
@@ -88,6 +111,8 @@ public class AxiPropCacheTest {
 	@Test
 	@Order(4)
 	public void testSyncWithUpdateChildRecord() {
+		axiPropCache.load();
+
 		axiProp = axiPropRepository.findByPropname("axe.cache.redis")
 				.orElseThrow(() -> new ResourceNotFoundException("Property with propname axe.cache.redis not found"));
 		AxiPropValue axiPropValue = axiProp.getAxipropvalue();
