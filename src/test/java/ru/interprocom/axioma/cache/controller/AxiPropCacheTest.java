@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AxiPropCacheTest {
-	private final MapContainer<String, Map<String, PropertyValueInfo>> container = new MapContainer<>(new HashMap<>());
+	private final MapContainer<String, PropertyValueInfo> container = new MapContainer<>(new HashMap<>());
 	private AxiPropCache axiPropCache;
 	private AxiProp axiProp;
 	private Map<String, PropertyValueInfo> cacheMap;

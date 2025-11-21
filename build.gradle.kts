@@ -33,10 +33,12 @@ dependencies {
         exclude(group = "io.netty", module = "netty-common")
         exclude(group = "io.netty", module = "netty-handler")
         exclude(group = "io.netty", module = "netty-codec")
+        exclude(group = "io.netty", module = "netty-buffer")
     }
     implementation("io.netty:netty-common:4.2.7.Final")
     implementation("io.netty:netty-handler:4.2.7.Final")
     implementation("io.netty:netty-codec:4.2.7.Final")
+    implementation("io.netty:netty-buffer:4.2.7.Final")
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-redis-spring:6.9.0")
     implementation("org.springframework.boot:spring-boot-starter-data-redis:3.5.3") {
